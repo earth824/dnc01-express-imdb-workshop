@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/db/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  admin
+  user
+}
+
+enum Genre {
+  action
+  animation
+  comedy
+  drama
+  horror
+  mystery
+  romance
+  sci_fi
+  thriller
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+  role     Role     @default(user)
+  ratings  Rating[]
+
+  @@map("users")
+}
+
+model Movie {
+  id            Int      @id @default(autoincrement())
+  title         String
+  releaseYear   Int      @map("release_year") @db.SmallInt
+  genre         Genre[]  @default([])
+  ratingSum     Int      @default(0) @map("rating_sum")
+  ratingCount   Int      @default(0) @map("rating_count")
+  averageRating Decimal  @default(0) @map("average_rating") @db.Decimal(4, 2)
+  ratings       Rating[]
+
+  @@map("movies")
+}
+
+model Rating {
+  id      Int   @id @default(autoincrement())
+  userId  Int   @map("user_id")
+  movieId Int   @map("movie_id")
+  rate    Int   @db.SmallInt
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie   Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+  @@map("ratings")
+}
