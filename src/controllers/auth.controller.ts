@@ -54,7 +54,7 @@ const login = async (
     throw new InvalidCredentialsException();
   }
 
-  const payload: UserPayload = { sub: String(user.id), role: user.role };
+  const payload: UserPayload = { id: user.id, role: user.role };
   const accessToken = jwt.sign(payload, env.JWT_SECRET, {
     expiresIn: env.JWT_EXPIRES_IN
   });
